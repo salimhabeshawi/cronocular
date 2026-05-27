@@ -108,6 +108,8 @@ func (m model) View() string {
 	b.WriteString("\n\n")
 	b.WriteString(helpLine(s.Paused))
 	b.WriteString("\n")
+	b.WriteString(mutedStyle.Render("by https://github.com/salimhabeshawi"))
+	b.WriteString("\n")
 	return b.String()
 }
 
