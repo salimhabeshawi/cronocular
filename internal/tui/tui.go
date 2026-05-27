@@ -58,10 +58,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch strings.ToLower(msg.String()) {
 		case "q", "ctrl+c":
 			return m, tea.Quit
-		case " ", "p":
+		case " ":
 			m.controller.TogglePause()
-		case "r":
-			m.controller.Resume()
 		}
 	case tickMsg:
 		return m, tick()
@@ -114,14 +112,8 @@ func (m model) View() string {
 }
 
 func helpLine(paused bool) string {
-	resume := "resume"
-	if !paused {
-		resume = "resume"
-	}
 	return mutedStyle.Render("[") +
-		hotkeyStyle.Render("p/space") + mutedStyle.Render(" pause") +
-		mutedStyle.Render("]  [") +
-		hotkeyStyle.Render("r") + mutedStyle.Render(" "+resume) +
+		hotkeyStyle.Render("space") + mutedStyle.Render(" pause/resume") +
 		mutedStyle.Render("]  [") +
 		hotkeyStyle.Render("q") + mutedStyle.Render(" quit]")
 }

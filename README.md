@@ -72,8 +72,7 @@ cronocular -d
 TUI controls:
 
 ```text
-p / space  pause or resume
-r          resume
+space      pause or resume
 q          quit
 ```
 
