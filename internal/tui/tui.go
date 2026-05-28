@@ -29,10 +29,10 @@ var (
 	focusStyle  = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("42"))
 )
 
-var geminiGradient = []rgb{
-	{r: 0x47, g: 0x96, b: 0xE4},
-	{r: 0x84, g: 0x7A, b: 0xCE},
-	{r: 0xC3, g: 0x67, b: 0x7F},
+var greenGradient = []rgb{
+	{r: 0x14, g: 0xB8, b: 0xA6},
+	{r: 0x22, g: 0xC5, b: 0x5E},
+	{r: 0xA3, g: 0xE6, b: 0x35},
 }
 
 const wordmark = `                                                                      
@@ -52,7 +52,7 @@ func Run(ctx context.Context, controller *timer.Controller) error {
 
 func newModel(controller *timer.Controller) model {
 	bar := progress.New(
-		progress.WithDefaultGradient(),
+		progress.WithGradient("#14B8A6", "#A3E635"),
 		progress.WithoutPercentage(),
 	)
 	bar.Width = 40
@@ -168,16 +168,16 @@ func gradientWordmark() string {
 
 func gradientColor(t float64) lipgloss.Color {
 	if t <= 0 {
-		return geminiGradient[0].color()
+		return greenGradient[0].color()
 	}
 	if t >= 1 {
-		return geminiGradient[len(geminiGradient)-1].color()
+		return greenGradient[len(greenGradient)-1].color()
 	}
 
-	scaled := t * float64(len(geminiGradient)-1)
+	scaled := t * float64(len(greenGradient)-1)
 	i := int(scaled)
 	local := scaled - float64(i)
-	return mix(geminiGradient[i], geminiGradient[i+1], local).color()
+	return mix(greenGradient[i], greenGradient[i+1], local).color()
 }
 
 func mix(a, b rgb, t float64) rgb {
