@@ -39,7 +39,7 @@ var rainbow = []lipgloss.Color{
 	lipgloss.Color("201"),
 }
 
-const wordmark = `                                 _            
+const wordmark = `                     _            
   ___ _ __ ___  _ __   ___   ___ _   _| | __ _ _ __ 
  / __| '__/ _ \| '_ \ / _ \ / __| | | | |/ _' | '__|
 | (__| | | (_) | | | | (_) | (__| |_| | | (_| | |   
