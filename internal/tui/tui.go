@@ -29,21 +29,20 @@ var (
 	focusStyle  = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("42"))
 )
 
-var rainbow = []lipgloss.Color{
-	lipgloss.Color("196"),
-	lipgloss.Color("202"),
-	lipgloss.Color("226"),
-	lipgloss.Color("46"),
-	lipgloss.Color("45"),
-	lipgloss.Color("21"),
-	lipgloss.Color("201"),
+var geminiGradient = []rgb{
+	{r: 0x47, g: 0x96, b: 0xE4},
+	{r: 0x84, g: 0x7A, b: 0xCE},
+	{r: 0xC3, g: 0x67, b: 0x7F},
 }
 
-const wordmark = `                                       _            
-  ___ _ __ ___  _ __   ___   ___ _   _| | __ _ _ __ 
- / __| '__/ _ \| '_ \ / _ \ / __| | | | |/ _' | '__|
-| (__| | | (_) | | | | (_) | (__| |_| | | (_| | |   
- \___|_|  \___/|_| |_|\___/ \___|\__,_|_|\__,_|_|`
+const wordmark = `                                                                      
+ ████  █████   ████  █    █  ████   ████  █    █ █        ██   █████  
+█    █ █    █ █    █ ██   █ █    █ █    █ █    █ █       █  █  █    █ 
+█      █    █ █    █ █ █  █ █    █ █      █    █ █      █    █ █    █ 
+█      █████  █    █ █  █ █ █    █ █      █    █ █      ██████ █████  
+█    █ █   █  █    █ █   ██ █    █ █    █ █    █ █      █    █ █   █  
+ ████  █    █  ████  █    █  ████   ████   ████  ██████ █    █ █    █ 
+                                                                      `
 
 func Run(ctx context.Context, controller *timer.Controller) error {
 	p := tea.NewProgram(newModel(controller), tea.WithContext(ctx))
@@ -114,7 +113,7 @@ func (m model) View() string {
 
 	var b strings.Builder
 	b.WriteString("\n")
-	b.WriteString(rainbowWordmark(s.UpdatedAt))
+	b.WriteString(gradientWordmark())
 	b.WriteString("\n")
 	b.WriteString(mutedStyle.Render("20-20-20 eye care timer"))
 	b.WriteString("  ")
@@ -129,21 +128,35 @@ func (m model) View() string {
 	return b.String()
 }
 
-func rainbowWordmark(now time.Time) string {
-	phase := int(now.UnixMilli()/120) % len(rainbow)
+type rgb struct {
+	r int
+	g int
+	b int
+}
+
+func gradientWordmark() string {
 	lines := strings.Split(wordmark, "\n")
+	width := 1
+	for _, line := range lines {
+		lineWidth := len([]rune(line))
+		if lineWidth > width {
+			width = lineWidth
+		}
+	}
+
 	var b strings.Builder
 
 	for y, line := range lines {
-		colorIndex := 0
+		x := 0
 		for _, r := range line {
 			if r == ' ' {
 				b.WriteRune(r)
+				x++
 				continue
 			}
-			color := rainbow[(colorIndex+y+phase)%len(rainbow)]
+			color := gradientColor(float64(x) / float64(width-1))
 			b.WriteString(lipgloss.NewStyle().Bold(true).Foreground(color).Render(string(r)))
-			colorIndex++
+			x++
 		}
 		if y < len(lines)-1 {
 			b.WriteByte('\n')
@@ -151,6 +164,32 @@ func rainbowWordmark(now time.Time) string {
 	}
 
 	return b.String()
+}
+
+func gradientColor(t float64) lipgloss.Color {
+	if t <= 0 {
+		return geminiGradient[0].color()
+	}
+	if t >= 1 {
+		return geminiGradient[len(geminiGradient)-1].color()
+	}
+
+	scaled := t * float64(len(geminiGradient)-1)
+	i := int(scaled)
+	local := scaled - float64(i)
+	return mix(geminiGradient[i], geminiGradient[i+1], local).color()
+}
+
+func mix(a, b rgb, t float64) rgb {
+	return rgb{
+		r: int(float64(a.r) + (float64(b.r)-float64(a.r))*t),
+		g: int(float64(a.g) + (float64(b.g)-float64(a.g))*t),
+		b: int(float64(a.b) + (float64(b.b)-float64(a.b))*t),
+	}
+}
+
+func (c rgb) color() lipgloss.Color {
+	return lipgloss.Color(fmt.Sprintf("#%02x%02x%02x", c.r, c.g, c.b))
 }
 
 func helpLine(paused bool) string {
