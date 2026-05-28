@@ -29,6 +29,22 @@ var (
 	focusStyle  = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("42"))
 )
 
+var rainbow = []lipgloss.Color{
+	lipgloss.Color("196"),
+	lipgloss.Color("202"),
+	lipgloss.Color("226"),
+	lipgloss.Color("46"),
+	lipgloss.Color("45"),
+	lipgloss.Color("21"),
+	lipgloss.Color("201"),
+}
+
+const wordmark = `                                 _            
+  ___ _ __ ___  _ __   ___   ___ _   _| | __ _ _ __ 
+ / __| '__/ _ \| '_ \ / _ \ / __| | | | |/ _' | '__|
+| (__| | | (_) | | | | (_) | (__| |_| | | (_| | |   
+ \___|_|  \___/|_| |_|\___/ \___|\__,_|_|\__,_|_|`
+
 func Run(ctx context.Context, controller *timer.Controller) error {
 	p := tea.NewProgram(newModel(controller), tea.WithContext(ctx))
 	_, err := p.Run()
@@ -98,8 +114,8 @@ func (m model) View() string {
 
 	var b strings.Builder
 	b.WriteString("\n")
-	b.WriteString(titleStyle.Render("cronocular"))
-	b.WriteString(" ")
+	b.WriteString(rainbowWordmark(s.UpdatedAt))
+	b.WriteString("\n")
 	b.WriteString(mutedStyle.Render("20-20-20 eye care timer"))
 	b.WriteString("  ")
 	b.WriteString(mutedStyle.Render("by https://github.com/salimhabeshawi"))
@@ -110,6 +126,30 @@ func (m model) View() string {
 	b.WriteString("\n\n")
 	b.WriteString(helpLine(s.Paused))
 	b.WriteString("\n")
+	return b.String()
+}
+
+func rainbowWordmark(now time.Time) string {
+	phase := int(now.UnixMilli()/120) % len(rainbow)
+	lines := strings.Split(wordmark, "\n")
+	var b strings.Builder
+
+	for y, line := range lines {
+		colorIndex := 0
+		for _, r := range line {
+			if r == ' ' {
+				b.WriteRune(r)
+				continue
+			}
+			color := rainbow[(colorIndex+y+phase)%len(rainbow)]
+			b.WriteString(lipgloss.NewStyle().Bold(true).Foreground(color).Render(string(r)))
+			colorIndex++
+		}
+		if y < len(lines)-1 {
+			b.WriteByte('\n')
+		}
+	}
+
 	return b.String()
 }
 
