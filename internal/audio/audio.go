@@ -12,6 +12,48 @@ import (
 	"time"
 )
 
+func PlayNotificationSound() {
+	switch runtime.GOOS {
+	case "darwin":
+		notifySoundDarwin()
+	case "windows":
+		notifySoundWindows()
+	default:
+		notifySoundLinux()
+	}
+}
+
+func notifySoundDarwin() {
+	for _, name := range []string{"Pop", "Ping", "Tink", "Glass"} {
+		path := "/System/Library/Sounds/" + name + ".aiff"
+		if _, err := os.Stat(path); err == nil {
+			exec.Command("afplay", path).Run()
+			return
+		}
+	}
+}
+
+func notifySoundWindows() {
+	script := "[System.Media.SystemSounds]::Notification.Play()"
+	for _, shell := range []string{"powershell", "pwsh"} {
+		if _, err := exec.LookPath(shell); err == nil {
+			exec.Command(shell, "-NoProfile", "-Command", script).Run()
+			return
+		}
+	}
+}
+
+func notifySoundLinux() {
+	if _, err := exec.LookPath("canberra-gtk-play"); err == nil {
+		for _, id := range []string{"message-new-instant", "message", "dialog-information"} {
+			cmd := exec.Command("canberra-gtk-play", "--id="+id)
+			if cmd.Run() == nil {
+				return
+			}
+		}
+	}
+}
+
 const sampleRate = 44100
 
 func PlayCompletionBeep() {

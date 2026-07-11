@@ -58,6 +58,7 @@ func main() {
 	actions := timer.Actions{
 		RestStarted: func() {
 			notify.Send("cronocular", "Look away for 20 seconds!")
+			go audio.PlayNotificationSound()
 		},
 		RestEnded: func() {
 			notify.Send("cronocular", "Time's up! Return to work.")
