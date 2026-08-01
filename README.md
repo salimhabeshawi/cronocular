@@ -1,5 +1,7 @@
 # cronocular
 
+![Cronocular screenshot](screenshot.jpg)
+
 `cronocular` is a lightweight terminal timer for the 20-20-20 eye care rule: every 20 minutes, look at something 20 feet away for 20 seconds. The name blends `cron` with `ocular`: scheduled care for your eyes.
 
 ## Install
@@ -9,6 +11,10 @@ Requires Go 1.22+.
 ### Linux
 
 Arch:
+
+> you guys are first class citizens :) you can download it from the AUR just by running `yay -S cronocular`
+
+-- OR --
 
 ```sh
 sudo pacman -S go libnotify pulseaudio-utils
